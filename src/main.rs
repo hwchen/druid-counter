@@ -1,7 +1,7 @@
 mod widget;
 
 use druid::widget::{Align, Button, Column, DynLabel, Padding};
-use druid::{AppLauncher, Data, Lens, LensWrap, Widget, WindowDesc};
+use druid::{AppLauncher, Data, Lens, Widget, WindowDesc};
 
 use crate::widget::TextEntry;
 
@@ -28,7 +28,7 @@ fn ui_builder() -> impl Widget<Model> {
     let text_entry = TextEntry::new(|_ctx, data: &mut Model, _env, text| {
         match text.parse::<u32>() {
             Ok(n) => data.set(n),
-            Err(err) => data.response = format!("{:?} is not a number", text),
+            Err(_err) => data.response = format!("{:?} is not a number", text),
         }
     });
 

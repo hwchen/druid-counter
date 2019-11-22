@@ -32,7 +32,7 @@ impl<T> Widget<T> for TextEntry<T> {
         &mut self,
         layout_ctx: &mut LayoutCtx,
         bc: &BoxConstraints,
-        data: &T,
+        _data: &T,
         env: &Env,
     ) -> Size {
 
@@ -41,7 +41,10 @@ impl<T> Widget<T> for TextEntry<T> {
 
     fn event(&mut self, event: &Event, ctx: &mut EventCtx, data: &mut T, env: &Env) {
         match event {
-            Event::KeyUp(KeyEvent { key_code, .. } ) if *key_code == KeyCode::Return => {
+            Event::KeyDown(KeyEvent { key_code, is_repeat, _ } ) => {
+                if *key_code == KeyCode::Return && !is_repeat && ctx.is_focus() {
+                ctx.set_handled();
+
                 // send contents of cache upstream
                 (self.action)(ctx, data, env, self.cache.trim().to_owned());
                 self.cache.clear();
@@ -50,6 +53,13 @@ impl<T> Widget<T> for TextEntry<T> {
         }
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: Option<&T>, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: Option<&T>, _data: &T, env: &Env) {
+        // to make sure that environment changes propagate through
+        self.child.update(
+            ctx,
+            None,
+            &self.cache,
+            &env,
+        )
     }
 }
